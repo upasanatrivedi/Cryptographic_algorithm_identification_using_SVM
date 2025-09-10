@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptographic Algorithm Identifier</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center">Cryptographic Algorithm Identifier</h2>
+        <form id="ciphertext-form">
+            <div class="form-group">
+                <label for="ciphertext-input">Enter Ciphertext:</label>
+                <input type="text" class="form-control" id="ciphertext-input" placeholder="Enter ciphertext" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+
+        <div id="result" style="display: none;">
+            <h4>Prediction:</h4>
+            <p id="prediction-result"></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#ciphertext-form").on("submit", function (e) {
+                e.preventDefault();
+                
+                const ciphertext = $("#ciphertext-input").val();
+                
+                // Sending the input to the backend
+                $.ajax({
+                    type: "POST",
+                    url: "/predict",  // Backend route for prediction
+                    data: JSON.stringify({ "ciphertext": ciphertext }),
+                    contentType: "application/json",
+                    success: function (response) {
+                        if (response.predicted_algorithm) {
+                            $("#prediction-result").text(`The ciphertext is encrypted with: ${response.predicted_algorithm}`);
+                            $("#result").show();
+                        } else {
+                            alert("Error: No prediction returned.");
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error occurred:", error.responseJSON || error);
+                        alert("Error occurred while making prediction!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
